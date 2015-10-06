@@ -25,26 +25,8 @@ public class btce_doTrade {
 
         Mac mac;
         SecretKeySpec key;
-        Map<String, String> arguments = new HashMap<String, String>();
 
-        arguments.put( "method" , method);  // Add the method to the post data.
-        arguments.put( "nonce",  ""+nonce_param);  // Add the dummy nonce.
-        arguments.put( "pair", pair);
-        arguments.put( "type", type);
-        arguments.put( "rate", rate);
-        arguments.put( "amount", amount);
-
-        String postData = "";
-
-        for( Iterator argumentIterator = arguments.entrySet().iterator(); argumentIterator.hasNext(); ) {
-            Map.Entry argument = (Map.Entry)argumentIterator.next();
-
-            if( postData.length() > 0) {
-                postData += "&";
-            }
-            postData += argument.getKey() + "=" + argument.getValue();
-        }
-
+        String postData = "method="+method+"&nonce="+nonce_param+"&type="+type+"&pair="+pair+"&amount="+amount+"&rate="+rate;
 
         // Create a new secret key
         try {
@@ -70,8 +52,6 @@ public class btce_doTrade {
             return null;
         }
 
-       /// Log.e("EEEEEEEEEEEE:", postData);
-
         Connection.Response response = null;
         try {
             response = Jsoup.connect(bm_Main.API_URL_PRIVATE)
@@ -79,16 +59,17 @@ public class btce_doTrade {
                     .ignoreContentType(true)
                     .header("Key", bm_Main.API_KEY)
                     .header("Sign", new String(Hex.encodeHex(mac.doFinal(postData.getBytes("UTF-8")))))
-                    .data("amount", "" + amount)
                     .data("method", "" + method)
-                    .data("rate", "" + rate)
+                    .data("nonce", "" + nonce_param)
                     .data("type", "" + type)
                     .data("pair", "" + pair)
-                    .data("nonce", "" + nonce_param)
+                    .data("amount", "" + amount)
+                    .data("rate", "" + rate)
                     .method(Connection.Method.POST)
                     .execute();
         } catch (Exception e) {
 //            Log.e("ERR", e.getMessage());
+
         }
 
         if(response!=null){
